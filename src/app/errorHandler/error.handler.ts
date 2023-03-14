@@ -17,10 +17,7 @@ function handleError(
     // If it is not a custom error, log error and convert it to a custom error, then log the custom error.
     if (!(err instanceof CustomError)) {
         console.log(err);
-        if (err.name == "MongoBulkWriteError"){
-            err = new CustomError(CustomErrorEnum.MONGO_BULK_WRITE_ERROR, 400);
-        }
-        else if (err.name == "InsufficientScopeError"){
+        if (err.name == "InsufficientScopeError"){
             err = new CustomError(CustomErrorEnum.INSUFFICIENT_SCOPE_ERROR, 403);
         }
         else if (err.name == "InvalidTokenError"){
@@ -28,9 +25,6 @@ function handleError(
         }
         else if (err.name == "UnauthorizedError"){
             err = new CustomError(CustomErrorEnum.NO_TOKEN_PROVIDED, 401);
-        }
-        else if (err.name == "MongooseServerSelectionError"){
-            err = new CustomError(CustomErrorEnum.SERVER_SELECTION_ERROR, 500);
         }
         else {
             // Debug messages to identify unknown error.

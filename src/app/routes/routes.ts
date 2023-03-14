@@ -20,17 +20,14 @@ const checkJwt = auth({
 
 const puzzleController = require('../controllers/puzzle.controller');
 
-const { validatePuzzleBodyPOST, validatePuzzleParameters, validatePuzzleBodyPATCH } = require("../validationAndSanitation/puzzle.validationAndSanitation");
-const { validationErrorHandler } = require('../validationAndSanitation/errorValidation');
-
 const postCheckScopes = requiredScopes('create:sudoku_puzzle');
 const patchCheckScopes = requiredScopes('update:sudoku_puzzle');
 const deleteCheckScopes = requiredScopes('delete:sudoku_puzzle');
 
-routes.post("/puzzles/", checkJwt, postCheckScopes, validatePuzzleBodyPOST, validationErrorHandler, puzzleController.create);
-routes.get("/puzzles/", checkJwt, validatePuzzleParameters, validationErrorHandler, puzzleController.search);
-routes.patch("/puzzles/", checkJwt, patchCheckScopes, validatePuzzleParameters, validatePuzzleBodyPATCH, validationErrorHandler, puzzleController.update);
-routes.delete("/puzzles/", checkJwt, deleteCheckScopes, validatePuzzleParameters, validationErrorHandler, puzzleController.remove);
+routes.post("/puzzles/", checkJwt, postCheckScopes, puzzleController.create);
+routes.get("/puzzles/", checkJwt, puzzleController.search);
+routes.patch("/puzzles/", checkJwt, patchCheckScopes, puzzleController.update);
+routes.delete("/puzzles/", checkJwt, deleteCheckScopes, puzzleController.remove);
 
 export = routes;
 

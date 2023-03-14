@@ -11,14 +11,11 @@
  */
 
 export enum CustomErrorEnum {
-    SERVER_SELECTION_ERROR = "The service is not able to connect to the database",
-    DATABASE_REQUEST_REJECTED = "The database rejected/failed your request",
     INSUFFICIENT_SCOPE_ERROR = "The user does not have the required scopes",
     NO_TOKEN_PROVIDED = "No Token Provided",
     INVALID_TOKEN = "Invalid Token",
     INVALID_PATH = "The path provided is invalid",
     INVALID_SYNTAX = "The request has invalid syntax",
-    MONGO_BULK_WRITE_ERROR = "There was an error writing to the database",
     PUZZLE_NOT_FOUND = "Puzzle matching search criteria was not found",
     DEFAULT_400_ERROR = "Invalid Request",
     DEFAULT_401_ERROR = "Invalid Permission",

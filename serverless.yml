@@ -1,4 +1,4 @@
-service: Puzzle
+service: UserActiveGamesBFF
 provider:
   name: aws
   runtime: nodejs18.x

@@ -1,8 +1,26 @@
 version: '3.8'
 
 services:
-  mongodb:
-    container_name: mongodb
+  puzzle:
+    container_name: puzzle-app
+    image: ghcr.io/sudokuru/puzzle:latest
+    restart: unless-stopped
+    command: npm run start
+    ports:
+      - "3000:3000"
+    links:
+      - mongo
+  useractivegames:
+    container_name: useractivegames-app
+    image: ghcr.io/sudokuru/useractivegames:latest
+    restart: unless-stopped
+    command: npm run start
+    ports:
+      - "3001:3001"
+    links:
+      - mongo
+  mongo:
+    container_name: mongo
     image: mongo:5.0.2
     restart: unless-stopped
     ports:

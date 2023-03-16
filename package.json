@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "useractivegamesbff",
   "version": "1.0.0",
   "description": "This is the backend for the sudokuru service",
   "main": "index.js",
@@ -26,6 +26,7 @@
   "homepage": "https://github.com/SudoKuru/Backend#readme",
   "dependencies": {
     "@types/mongoose": "^5.11.97",
+    "axios": "^1.3.4",
     "express": "^4.18.2",
     "express-oauth2-jwt-bearer": "^1.3.0",
     "express-validator": "^6.14.2",

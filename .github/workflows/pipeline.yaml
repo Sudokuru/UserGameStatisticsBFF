@@ -57,7 +57,6 @@ jobs:
   deploy_documentation:
     name: Deploy Documentation
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

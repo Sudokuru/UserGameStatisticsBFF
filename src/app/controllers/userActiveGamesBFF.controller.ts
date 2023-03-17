@@ -1,14 +1,13 @@
 /**
  * This is the controller file for the puzzle endpoint
  * This file is called by the router file and calls the service file
- * There are four main functions {@link createPuzzle}, {@link createGame},
- * {@link updatePuzzle}, and {@link removePuzzle}
+ * There are four main functions {@link getGame}, {@link createGame},
+ * {@link updateGame}, and {@link endGame}
  * The main purpose of the controller is to make sure that only validated and sanitized data
  * moves on to the service function
  * @module PuzzleController
  */
 
-import {matchedData} from "express-validator";
 import {CustomError, CustomErrorEnum} from "../models/error.model";
 
 const puzzleService = require('../services/userActiveGamesBFF.service');
@@ -37,62 +36,84 @@ async function createGame(req, res, next) {
 }
 
 /**
- * Returns 201 if puzzleService is successful
+ * Returns 201 if getGameService is successful
  * Otherwise catches error and sends to our errorHandler
- * Takes sanitized input and sends it to puzzleService
+ * Takes sanitized input and sends it to getGameService
  * @param req This is the request object
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function createPuzzle(req, res, next) {
+async function getGame(req, res, next) {
 
-    const allData = Object.values(matchedData(req, { locations: ['body'] }));
-    // this is needed because the last element in matchedData array is the original request for some reason.
-    // I believe this is a bug with express-validator relating to bodies that have arrays
-    allData.pop();
     try {
-        // override successful completion code of 200 to 201 for successful object creation
-        res.status(201).json(await puzzleService.createPuzzle(allData));
+        res.json(await puzzleService.getGame(req));
     } catch(err) {
         next(err);
     }
 }
 
 /**
- * Returns 200 if puzzleService is successful
+ * Returns 200 if updateGameService is successful
  * Otherwise catches error and sends to our errorHandler
- * Takes sanitized input and sends it to puzzleService
+ * Takes sanitized input and sends it to updateGameService
  * @param req This is the request object
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function updatePuzzle(req, res, next) {
+async function updateGame(req, res, next) {
 
-    const queryData = matchedData(req, { locations: ['query'] });
-    const bodyData = matchedData(req, { locations: ['body'] });
     try {
-        res.json(await puzzleService.updatePuzzle(bodyData, queryData));
+        if (!('puzzle' in req.query)){
+            throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
+        }
+
+        res.json(await puzzleService.updateGame(req.query['puzzle'], req));
     } catch(err) {
         next(err);
     }
 }
 
 /**
- * Returns 200 if puzzleService is successful
+ * Returns 200 if endGameService is successful
  * Otherwise catches error and sends to our errorHandler
- * Takes sanitized input and sends it to puzzleService
+ * Takes sanitized input and sends it to endGameService
  * @param req This is the request object
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function removePuzzle(req, res, next) {
+async function endGame(req, res, next) {
 
-    const allData = matchedData(req, { locations: ['query'] });
     try {
-        res.json(await puzzleService.removePuzzle(allData));
+        if (!('puzzle' in req.query)){
+            throw new CustomError(CustomErrorEnum.ENDGAME_INVALIDPUZZLE, 400);
+        }
+
+        res.json(await puzzleService.endGame(req.query['puzzle'], req));
     } catch(err) {
         next(err);
     }
 }
 
-export = {create: createPuzzle, createGame: createGame, updateGame: updatePuzzle, endGame: removePuzzle }
+/**
+ * Returns 200 if getDrillService is successful
+ * Otherwise catches error and sends to our errorHandler
+ * Takes sanitized input and sends it to getGameService
+ * @param req This is the request object
+ * @param res This is the response object
+ * @param next This takes us to the errorHandler if request fails
+ */
+async function getDrill(req, res, next) {
+
+    try {
+        console.log(req.query);
+        if (!('drillStrategies' in req.query)){
+            throw new CustomError(CustomErrorEnum.GETDRILL_INVALIDDRILLSTRATEGIES, 400);
+        }
+
+        res.json(await puzzleService.getDrill(req.query['drillStrategies'], req));
+    } catch(err) {
+        next(err);
+    }
+}
+
+export = {getGame: getGame, createGame: createGame, updateGame: updateGame, endGame: endGame, getDrill: getDrill }

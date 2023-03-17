@@ -1,8 +1,8 @@
 /**
  * This is the puzzle service file
  * This file takes input from the controller and directs it to the db.service file
- * The five functions are {@link puzzleCreateService}, {@link createGameService},
- * {@link puzzleUpdateService}, {@link puzzleRemoveService}, and {@link filterInputQuery}
+ * The five functions are {@link getGameService}, {@link createGameService},
+ * {@link saveGameService}, {@link endGameService}, and {@link filterInputQuery}
  * The main purpose of this service file is to perform the 'business' logic
  * Any errors will be caught by our try/catch block in our controller
  * @module
@@ -100,32 +100,140 @@ async function createGameService(difficulty:number, req:any) {
 }
 
 /**
- * This function takes the JSON puzzles and sends them to the upload function
- * There is no need for any additional logic here
- * @param puzzles This is an array of JSON puzzles
+ *
+ *
+ * @param req
  */
-async function puzzleCreateService(puzzles) {
+async function getGameService(req) {
 
+    let token = req.auth.payload;
+    let responseBody = null;
+
+    // get active game with puzzle info
+
+    await axios.get(baseUserActiveGamesUrl + "?userID=" + token.sub.toString(), {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    }).then(function (response) {
+        if (response.status !== 200){
+            throw new CustomError(CustomErrorEnum.GETGAME_GETACTIVEGAME_FAILED, response.status);
+        }
+        responseBody = response.data;
+    })
+        .catch(function (error) {
+            let responseCode = 500
+            if (error.response){
+                responseCode = error.response.status;
+            }
+            throw new CustomError(CustomErrorEnum.GETGAME_GETACTIVEGAME_FAILED, responseCode);
+        });
+
+    return responseBody;
+
+    //return UserActiveGame object.
 }
 
 /**
  * This function takes in bodyData and queryData and updates all puzzles
  * that match the queryData with the bodyData
  * This function calls a helper function to create the inputQuery for the database function
- * @param bodyData this stores a JSON object with values to be updated
- * @param queryData this stores a JSON object with values used to retrieve puzzles to be updated
+ * @param puzzle
+ * @param req
  */
-async function puzzleUpdateService(bodyData, queryData) {
+async function saveGameService(puzzle, req) {
+
+    let token = req.auth.payload;
+    let responseBody = null;
+
+    await axios.patch(baseUserActiveGamesUrl + "?userID=" + token.sub.toString() + "&puzzle=" + puzzle, req.body, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    }).then(function (response) {
+        if (response.status !== 200){
+            throw new CustomError(CustomErrorEnum.SAVEGAME_PATCHACTIVEGAME_FAILED, response.status);
+        }
+        responseBody = response.data;
+    })
+        .catch(function (error) {
+            let responseCode = 500
+            if (error.response){
+                responseCode = error.response.status;
+            }
+            throw new CustomError(CustomErrorEnum.SAVEGAME_PATCHACTIVEGAME_FAILED, responseCode);
+        });
+
+    return responseBody;
 }
 
 /**
- * This function takes in the input query and deletes any puzzles that match the query
+ * This function takes in the input query and deletes any UserActiveGames that match the query
  * We do not throw an error here to stay aligned with standard practice.
  * A delete request is successful even if the object did not exist.
- * @param puzzles this stores a JSON object that stores the query
+ * @param puzzle
+ * @param req
  */
-async function puzzleRemoveService(puzzles) {
+async function endGameService(puzzle, req) {
+
+    let token = req.auth.payload;
+    let responseBody = null;
+
+    // delete all existing user active games
+    await axios.delete(baseUserActiveGamesUrl + "?userID=" + token.sub.toString() + "&puzzle=" + puzzle, {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    }).then(function (response) {
+        if (response.status !== 200){
+            throw new CustomError(CustomErrorEnum.ENDGAME_DELETEACTIVEGAME_FAILED, response.status);
+        }
+        responseBody = response.data;
+    })
+        .catch(function (error) {
+            let responseCode = 500
+            if (error.response){
+                responseCode = error.response.status;
+            }
+            throw new CustomError(CustomErrorEnum.ENDGAME_DELETEACTIVEGAME_FAILED, responseCode);
+        });
+
+    return responseBody;
 }
 
-export = { createPuzzle: puzzleCreateService, createGameService: createGameService, updatePuzzle: puzzleUpdateService, removePuzzle: puzzleRemoveService };
+/**
+ *
+ *
+ * @param req
+ */
+async function getDrillService(drillStrategy, req) {
+
+    let responseBody = null;
+
+    // get drill game
+
+    await axios.get(basePuzzleUrl + "?drillStrategies[]=" + drillStrategy + "&count=1", {
+        headers: {
+            Authorization: req.headers.authorization
+        }
+    }).then(function (response) {
+        if (response.status !== 200){
+            throw new CustomError(CustomErrorEnum.GETDRILL_FAILED, response.status);
+        }
+        responseBody = response.data;
+    })
+        .catch(function (error) {
+            let responseCode = 500
+            if (error.response){
+                responseCode = error.response.status;
+            }
+            throw new CustomError(CustomErrorEnum.GETDRILL_FAILED, responseCode);
+        });
+
+    return responseBody;
+
+    //return Puzzle object.
+}
+
+export = { getGame: getGameService, createGameService: createGameService, updateGame: saveGameService, endGame: endGameService, getDrill: getDrillService };
 

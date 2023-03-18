@@ -25,6 +25,11 @@ process.argv.forEach(function(val, index, array) {
 app.use(expressApp.urlencoded({ extended: true }));
 app.use(expressApp.json());
 
+const cors = require('cors');
+app.use(cors({
+    origin: ['https://sudokuru-dev.vercel.app', 'https://sudokuru.vercel.app']
+}));
+
 const baseRoute: string = "/api/v1";
 
 const globalRouter = require('./app/routes/routes');

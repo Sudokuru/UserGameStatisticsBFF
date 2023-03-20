@@ -30,6 +30,7 @@ async function createGameService(difficulty:number, req:any) {
     let responseBody = null;
 
     // delete all existing user active games
+    console.log(baseUserActiveGamesUrl + "?userID=" + token.sub.toString());
     await axios.delete(baseUserActiveGamesUrl + "?userID=" + token.sub.toString(), {
         headers: {
             Authorization: req.headers.authorization

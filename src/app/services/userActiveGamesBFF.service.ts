@@ -30,8 +30,7 @@ async function createGameService(difficulty:number, req:any) {
     let responseBody = null;
 
     // delete all existing user active games
-    console.log(baseUserActiveGamesUrl + "?userID=" + token.sub.toString());
-    await axios.delete(baseUserActiveGamesUrl + "?userID=" + token.sub.toString(), {
+    await axios.delete(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()), {
         headers: {
             Authorization: req.headers.authorization
         }
@@ -72,7 +71,7 @@ async function createGameService(difficulty:number, req:any) {
     // create active game with puzzle info
 
     const bodyData = [{
-        "userID": token.sub.toString(),
+        "userID": parseUserID(token.sub.toString()),
         "puzzle": puzzleGetResponse[0].puzzle,
         "puzzleSolution": puzzleGetResponse[0].puzzleSolution
     }];
@@ -111,8 +110,7 @@ async function getGameService(req) {
     let responseBody = null;
 
     // get active game with puzzle info
-
-    await axios.get(baseUserActiveGamesUrl + "?userID=" + token.sub.toString(), {
+    await axios.get(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()), {
         headers: {
             Authorization: req.headers.authorization
         }
@@ -147,7 +145,7 @@ async function saveGameService(puzzle, req) {
     let token = req.auth.payload;
     let responseBody = null;
 
-    await axios.patch(baseUserActiveGamesUrl + "?userID=" + token.sub.toString() + "&puzzle=" + puzzle, req.body, {
+    await axios.patch(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()) + "&puzzle=" + puzzle, req.body, {
         headers: {
             Authorization: req.headers.authorization
         }
@@ -181,7 +179,7 @@ async function endGameService(puzzle, req) {
     let responseBody = null;
 
     // delete all existing user active games
-    await axios.delete(baseUserActiveGamesUrl + "?userID=" + token.sub.toString() + "&puzzle=" + puzzle, {
+    await axios.delete(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()) + "&puzzle=" + puzzle, {
         headers: {
             Authorization: req.headers.authorization
         }
@@ -205,6 +203,7 @@ async function endGameService(puzzle, req) {
 /**
  *
  *
+ * @param drillStrategy
  * @param req
  */
 async function getDrillService(drillStrategy, req) {
@@ -234,6 +233,10 @@ async function getDrillService(drillStrategy, req) {
     return responseBody;
 
     //return Puzzle object.
+}
+
+function parseUserID(userID){
+    return userID.replace(new RegExp("[|]", "g"), "-")
 }
 
 export = { getGame: getGameService, createGameService: createGameService, updateGame: saveGameService, endGame: endGameService, getDrill: getDrillService };

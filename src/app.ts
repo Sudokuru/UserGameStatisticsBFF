@@ -25,6 +25,7 @@ process.argv.forEach(function(val, index, array) {
 app.use(expressApp.urlencoded({ extended: true }));
 app.use(expressApp.json());
 
+// This makes it so that only our Dev and Prod website can communicate with this BFF
 const cors = require('cors');
 app.use(cors({
     origin: ['https://sudokuru-dev.vercel.app', 'https://sudokuru.vercel.app']

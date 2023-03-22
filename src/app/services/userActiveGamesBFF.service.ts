@@ -20,10 +20,10 @@ const baseUserActiveGamesUrl = process.env.USER_ACTIVE_GAMES_URL + '/api/v1/user
  * This function takes in the input query and throws and error if no puzzles
  * are found to match the query
  * This function calls a helper function to create the inputQuery for the dataBase function
- * @param difficulty is an integer storing requested difficulty
+ * @param closestDifficulty is an integer storing requested closestDifficulty
  * @param req
  */
-async function createGameService(difficulty:number, req:any) {
+async function createGameService(closestDifficulty:number, req:any) {
 
     let token = req.auth.payload;
     let puzzleGetResponse = null;
@@ -48,7 +48,7 @@ async function createGameService(difficulty:number, req:any) {
     });
 
     // get puzzle from puzzle database
-    await axios.get(basePuzzleUrl + "?difficulty=" + difficulty + "&count=1", {
+    await axios.get(basePuzzleUrl + "?closestDifficulty=" + closestDifficulty + "&count=1", {
         headers: {
             Authorization: req.headers.authorization
         }

@@ -25,11 +25,11 @@ async function createGame(req, res, next) {
 
     try {
         // if difficulty is not provided in parameters we throw error
-        if (!('difficulty' in req.query)){
+        if (!('closestDifficulty' in req.query)){
             throw new CustomError(CustomErrorEnum.STARTGAME_INVALIDDIFFICULTY, 400);
         }
 
-        res.json(await puzzleService.createGameService(req.query['difficulty'], req));
+        res.json(await puzzleService.createGameService(req.query['closestDifficulty'], req));
     } catch(err) {
         next(err);
     }

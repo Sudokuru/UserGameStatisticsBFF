@@ -228,7 +228,7 @@ async function getDrillService(drillStrategy, req) {
 
     // get drill game
 
-    await axios.get(basePuzzleUrl + "?drillStrategies[]=" + drillStrategy + "&count=1", {
+    await axios.get(basePuzzleUrl + "?drillStrategies[]=" + drillStrategy + "&count=1&random=true", {
         headers: {
             Authorization: req.headers.authorization
         }

@@ -29,6 +29,21 @@ async function createGameService(closestDifficulty:number, req:any) {
     let puzzleGetResponse = null;
     let responseBody = null;
 
+    let minDifficulty;
+    let maxDifficulty;
+
+    if (closestDifficulty < 950){
+        maxDifficulty = closestDifficulty + 50;
+    } else {
+        maxDifficulty = 1000;
+    }
+
+    if (closestDifficulty > 50){
+        minDifficulty = closestDifficulty - 50;
+    } else {
+        minDifficulty = 1;
+    }
+
     // delete all existing user active games
     await axios.delete(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()), {
         headers: {
@@ -48,7 +63,7 @@ async function createGameService(closestDifficulty:number, req:any) {
     });
 
     // get puzzle from puzzle database
-    await axios.get(basePuzzleUrl + "?closestDifficulty=" + closestDifficulty + "&count=1", {
+    await axios.get(basePuzzleUrl + "?minDifficulty=" + minDifficulty + "&maxDifficulty=" + maxDifficulty + "&count=1&random=true", {
         headers: {
             Authorization: req.headers.authorization
         }

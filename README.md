@@ -33,11 +33,13 @@
 ```console
 npm run docker
 ```
-5. The app can then be run with the command:<br>
+5. Create .env file with environment variables
+6. Run npm i
+7. The app can then be run with the command:<br>
 ```console
 npm run start
 ```
-6. Integration tests can be run when the app is running with this command:<br>
+8. Integration tests can be run when the app is running with this command:<br>
 ```console
 npm run test:integration
 ```

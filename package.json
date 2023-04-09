@@ -1,5 +1,5 @@
 {
-  "name": "useractivegamesbff",
+  "name": "usergamestatisticsbff",
   "version": "1.0.0",
   "description": "This is the backend for the sudokuru service",
   "main": "index.js",
@@ -9,7 +9,7 @@
     "test:integration500s": "newman run \"postman/collections/Sudokuru-Backend-500s\"",
     "update-docs": "typedoc --entryPoints src --entryPointStrategy expand --out docs --plugin typedoc-theme-hierarchy --theme hierarchy",
     "docker": "npm run docker:pull && docker-compose up -d",
-    "docker:pull": "docker pull ghcr.io/sudokuru/puzzle && docker pull ghcr.io/sudokuru/useractivegames && docker pull ghcr.io/sudokuru/usergamestatistics",
+    "docker:pull": "docker pull ghcr.io/sudokuru/usergamestatistics",
     "app": "docker-compose -f docker-compose-app.yml up -d",
     "start": "ts-node src/app.ts local",
     "deploy": "tsc && serverless deploy -c serverless.yml"

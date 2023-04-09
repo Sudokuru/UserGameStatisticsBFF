@@ -1,4 +1,4 @@
-service: UserActiveGamesBFF
+service: UserGameStatisticsBFF
 provider:
   name: aws
   runtime: nodejs18.x

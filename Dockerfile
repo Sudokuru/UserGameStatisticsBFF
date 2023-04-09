@@ -3,4 +3,4 @@ WORKDIR .
 COPY package*.json ./
 RUN npm ci
 COPY . .
-EXPOSE 2901
+EXPOSE 2902

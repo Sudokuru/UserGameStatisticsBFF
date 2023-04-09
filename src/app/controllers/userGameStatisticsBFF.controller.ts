@@ -40,7 +40,7 @@ async function getLearnedLessons(req, res, next) {
 async function patchLearnedLessons(req, res, next) {
 
     try {
-        if (!('learnedLessons' in req.body)){
+        if (!('strategiesLearned' in req.body)){
             throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
         }
         res.json(await userGameStatisticsBFFService.patchLearnedLessons(req));
@@ -58,12 +58,7 @@ async function patchLearnedLessons(req, res, next) {
  * @param next This takes us to the errorHandler if request fails
  */
 async function getGameStatistics(req, res, next) {
-
     try {
-        if (!('puzzle' in req.query)){
-            throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
-        }
-
         res.json(await userGameStatisticsBFFService.getGameStatistics(req.query['puzzle'], req));
     } catch(err) {
         next(err);
@@ -79,7 +74,6 @@ async function getGameStatistics(req, res, next) {
  * @param next This takes us to the errorHandler if request fails
  */
 async function deleteGameStatistics(req, res, next) {
-
     try {
         res.json(await userGameStatisticsBFFService.deleteGameStatistics(req));
     } catch(err) {

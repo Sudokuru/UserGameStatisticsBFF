@@ -40,6 +40,9 @@ async function getLearnedLessons(req, res, next) {
 async function patchLearnedLessons(req, res, next) {
 
     try {
+        if (!('learnedLessons' in req.body)){
+            throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
+        }
         res.json(await userGameStatisticsBFFService.patchLearnedLessons(req));
     } catch(err) {
         next(err);

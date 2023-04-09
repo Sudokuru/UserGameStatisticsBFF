@@ -93,7 +93,7 @@ async function patchLearnedLessons(req) {
     let responseBody = null;
 
     // get active game with puzzle info
-    await axios.get(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()), {
+    await axios.patch(baseUserGameStatisticsUrl + "?userID=" + parseUserID(token.sub.toString()) + "&dateRange=1111-11-11", req.body, {
         headers: {
             Authorization: req.headers.authorization
         }

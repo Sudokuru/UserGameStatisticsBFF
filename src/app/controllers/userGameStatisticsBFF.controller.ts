@@ -10,7 +10,7 @@
 
 import {CustomError, CustomErrorEnum} from "../models/error.model";
 
-const puzzleService = require('../services/userActiveGamesBFF.service');
+const puzzleService = require('../services/userGameStatisticsBFF.service');
 
 
 /**
@@ -46,7 +46,7 @@ async function createGame(req, res, next) {
 async function getGame(req, res, next) {
 
     try {
-        res.json(await puzzleService.getGame(req));
+        res.json(await puzzleService.patchLearnedLessons(req));
     } catch(err) {
         next(err);
     }
@@ -67,7 +67,7 @@ async function updateGame(req, res, next) {
             throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
         }
 
-        res.json(await puzzleService.updateGame(req.query['puzzle'], req));
+        res.json(await puzzleService.getGameStatistics(req.query['puzzle'], req));
     } catch(err) {
         next(err);
     }
@@ -88,7 +88,7 @@ async function endGame(req, res, next) {
             throw new CustomError(CustomErrorEnum.ENDGAME_INVALIDPUZZLE, 400);
         }
 
-        res.json(await puzzleService.endGame(req.query['puzzle'], req));
+        res.json(await puzzleService.deleteGameStatistics(req.query['puzzle'], req));
     } catch(err) {
         next(err);
     }
@@ -116,4 +116,4 @@ async function getDrill(req, res, next) {
     }
 }
 
-export = {getGame: getGame, createGame: createGame, updateGame: updateGame, endGame: endGame, getDrill: getDrill }
+export = {patchLearnedLessons: getGame, getLearnedLessons: createGame, getGameStatistics: updateGame, deleteGameStatistics: endGame, getDrill: getDrill }

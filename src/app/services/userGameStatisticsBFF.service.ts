@@ -464,5 +464,5 @@ function parseUserID(userID){
     return userID.replace(new RegExp("[|]", "g"), "-")
 }
 
-export = { getGame: getGameService, createGameService: createGameService, updateGame: saveGameService, endGame: endGameService, getDrill: getDrillService };
+export = { patchLearnedLessons: getGameService, createGameService: createGameService, getGameStatistics: saveGameService, deleteGameStatistics: endGameService, getDrill: getDrillService };
 

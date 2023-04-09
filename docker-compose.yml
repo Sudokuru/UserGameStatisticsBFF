@@ -19,6 +19,15 @@ services:
       - "3001:3001"
     links:
       - mongo
+  usergamestatistics:
+    container_name: usergamestatistics-app
+    image: ghcr.io/sudokuru/usergamestatistics:latest
+    restart: unless-stopped
+    command: npm run start
+    ports:
+      - "3002:3002"
+    links:
+      - mongo
   mongo:
     container_name: mongo
     image: mongo:5.0.2

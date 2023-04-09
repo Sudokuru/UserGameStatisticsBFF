@@ -1,8 +1,8 @@
 /**
  * This is the controller file for the puzzle endpoint
  * This file is called by the router file and calls the service file
- * There are four main functions {@link getGame}, {@link createGame},
- * {@link updateGame}, and {@link endGame}
+ * There are four main functions {@link patchLearnedLessons}, {@link getLearnedLessons},
+ * {@link getGameStatistics}, and {@link deleteGameStatistics}
  * The main purpose of the controller is to make sure that only validated and sanitized data
  * moves on to the service function
  * @module PuzzleController
@@ -10,7 +10,7 @@
 
 import {CustomError, CustomErrorEnum} from "../models/error.model";
 
-const puzzleService = require('../services/userGameStatisticsBFF.service');
+const userGameStatisticsBFFService = require('../services/userGameStatisticsBFF.service');
 
 
 /**
@@ -21,15 +21,9 @@ const puzzleService = require('../services/userGameStatisticsBFF.service');
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function createGame(req, res, next) {
-
+async function getLearnedLessons(req, res, next) {
     try {
-        // if difficulty is not provided in parameters we throw error
-        if (!('closestDifficulty' in req.query)){
-            throw new CustomError(CustomErrorEnum.STARTGAME_INVALIDDIFFICULTY, 400);
-        }
-
-        res.json(await puzzleService.createGameService(Number(req.query['closestDifficulty']), req));
+        res.json(await userGameStatisticsBFFService.getLearnedLessons(req));
     } catch(err) {
         next(err);
     }
@@ -43,10 +37,10 @@ async function createGame(req, res, next) {
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function getGame(req, res, next) {
+async function patchLearnedLessons(req, res, next) {
 
     try {
-        res.json(await puzzleService.patchLearnedLessons(req));
+        res.json(await userGameStatisticsBFFService.patchLearnedLessons(req));
     } catch(err) {
         next(err);
     }
@@ -60,14 +54,14 @@ async function getGame(req, res, next) {
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function updateGame(req, res, next) {
+async function getGameStatistics(req, res, next) {
 
     try {
         if (!('puzzle' in req.query)){
             throw new CustomError(CustomErrorEnum.SAVEGAME_INVALIDPUZZLE, 400);
         }
 
-        res.json(await puzzleService.getGameStatistics(req.query['puzzle'], req));
+        res.json(await userGameStatisticsBFFService.getGameStatistics(req.query['puzzle'], req));
     } catch(err) {
         next(err);
     }
@@ -81,39 +75,13 @@ async function updateGame(req, res, next) {
  * @param res This is the response object
  * @param next This takes us to the errorHandler if request fails
  */
-async function endGame(req, res, next) {
+async function deleteGameStatistics(req, res, next) {
 
     try {
-        if (!('puzzle' in req.query)){
-            throw new CustomError(CustomErrorEnum.ENDGAME_INVALIDPUZZLE, 400);
-        }
-
-        res.json(await puzzleService.deleteGameStatistics(req.query['puzzle'], req));
+        res.json(await userGameStatisticsBFFService.deleteGameStatistics(req));
     } catch(err) {
         next(err);
     }
 }
 
-/**
- * Returns 200 if getDrillService is successful
- * Otherwise catches error and sends to our errorHandler
- * Takes sanitized input and sends it to getGameService
- * @param req This is the request object
- * @param res This is the response object
- * @param next This takes us to the errorHandler if request fails
- */
-async function getDrill(req, res, next) {
-
-    try {
-        console.log(req.query);
-        if (!('drillStrategies' in req.query)){
-            throw new CustomError(CustomErrorEnum.GETDRILL_INVALIDDRILLSTRATEGIES, 400);
-        }
-
-        res.json(await puzzleService.getDrill(req.query['drillStrategies'], req));
-    } catch(err) {
-        next(err);
-    }
-}
-
-export = {patchLearnedLessons: getGame, getLearnedLessons: createGame, getGameStatistics: updateGame, deleteGameStatistics: endGame, getDrill: getDrill }
+export = {patchLearnedLessons: patchLearnedLessons, getLearnedLessons: getLearnedLessons, getGameStatistics: getGameStatistics, deleteGameStatistics: deleteGameStatistics}

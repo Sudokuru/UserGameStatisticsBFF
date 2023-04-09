@@ -1,8 +1,8 @@
 /**
  * This is the puzzle service file
  * This file takes input from the controller and directs it to the db.service file
- * The five functions are {@link getGameService}, {@link createGameService},
- * {@link saveGameService}, {@link endGameService}, and {@link filterInputQuery}
+ * The five functions are {@link patchLearnedLessons}, {@link getLearnedLessons},
+ * {@link getGameStatistics}, {@link deleteGameStatistics}, and {@link filterInputQuery}
  * The main purpose of this service file is to perform the 'business' logic
  * Any errors will be caught by our try/catch block in our controller
  * @module
@@ -21,99 +21,65 @@ const baseUserGameStatisticsUrl = process.env.USER_GAME_STATISTICS_URL + '/api/v
  * This function takes in the input query and throws and error if no puzzles
  * are found to match the query
  * This function calls a helper function to create the inputQuery for the dataBase function
- * @param closestDifficulty is an integer storing requested closestDifficulty
  * @param req
  */
-async function createGameService(closestDifficulty:number, req:any) {
+async function getLearnedLessons(req:any) {
 
     let token = req.auth.payload;
-    let puzzleGetResponse = null;
-    let responseBody = null;
+    let totalStatsResponseBody;
 
-    let minDifficulty;
-    let maxDifficulty;
-
-    if (closestDifficulty < 950){
-        maxDifficulty = closestDifficulty + 50;
-    } else {
-        maxDifficulty = 1000;
-    }
-
-    if (closestDifficulty > 50){
-        minDifficulty = closestDifficulty - 50;
-    } else {
-        minDifficulty = 1;
-    }
-
-    // delete all existing user active games
-    await axios.delete(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()), {
+    // retrieve user's total game statistics
+    let totalStatisticsResponseCode = 0;
+    await axios.get(baseUserGameStatisticsUrl + "?userID=" + parseUserID(token.sub.toString()) + "&dateRange=1111-11-11", {
         headers: {
             Authorization: req.headers.authorization
         }
     }).then(function (response) {
-        if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.STARTGAME_DELETEOLDACTIVEGAMES_FAILED, response.status);
+        totalStatisticsResponseCode = response.status;
+        if (response.status == 200){
+            totalStatsResponseBody = response.data;
         }
-    })
-    .catch(function (error) {
-        let responseCode = 500
-        if (error.response){
-            responseCode = error.response.status;
-        }
-        throw new CustomError(CustomErrorEnum.STARTGAME_DELETEOLDACTIVEGAMES_FAILED, responseCode);
-    });
-
-    // get puzzle from puzzle database
-    await axios.get(basePuzzleUrl + "?minDifficulty=" + minDifficulty + "&maxDifficulty=" + maxDifficulty + "&count=1&random=true", {
-        headers: {
-            Authorization: req.headers.authorization
-        }
-    }).then(function (response) {
-        if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.STARTGAME_GETPUZZLE_FAILED, response.status);
-        }
-        puzzleGetResponse = response.data;
     })
         .catch(function (error) {
-            let responseCode = 500
             if (error.response){
-                responseCode = error.response.status;
+                totalStatisticsResponseCode = error.response.status;
             }
-            throw new CustomError(CustomErrorEnum.STARTGAME_GETPUZZLE_FAILED, responseCode);
         });
 
-    //todo verify game has not been played before by player
+    if (totalStatisticsResponseCode != 200 && totalStatisticsResponseCode != 404){
+        throw new CustomError(CustomErrorEnum.ENDGAME_GETTOTALUSERGAMESTATISTICS_FAILED, totalStatisticsResponseCode);
+    }
 
-    // create active game with puzzle info
+    // if we get a 404 we want to create and initialize user statistics
+    if (totalStatisticsResponseCode == 404) {
 
-    const bodyData = [{
-        "userID": parseUserID(token.sub.toString()),
-        "puzzle": puzzleGetResponse[0].puzzle,
-        "puzzleSolution": puzzleGetResponse[0].puzzleSolution,
-        "difficulty": puzzleGetResponse[0].difficulty
-    }];
+        const bodyData = [{
+            "userID": parseUserID(token.sub.toString()),
+            "dateRange": "1111-11-11",
+        }];
 
-    await axios.post(baseUserActiveGamesUrl, bodyData, {
-        headers: {
-            Authorization: req.headers.authorization
-        }
-    }).then(function (response) {
-        if (response.status !== 201){
-            throw new CustomError(CustomErrorEnum.STARTGAME_CREATEACTIVEGAME_FAILED, response.status);
-        }
-        responseBody = response.data;
-    })
-        .catch(function (error) {
-            let responseCode = 500
-            if (error.response){
-                responseCode = error.response.status;
+        await axios.post(baseUserGameStatisticsUrl, bodyData, {
+            headers: {
+                Authorization: req.headers.authorization
             }
-            throw new CustomError(CustomErrorEnum.STARTGAME_CREATEACTIVEGAME_FAILED, responseCode);
-        });
+        }).then(function (response) {
+            if (response.status !== 201) {
+                throw new CustomError(CustomErrorEnum.ENDGAME_CREATETOTALUSERGAMESTATISTICS_FAILED, response.status);
+            }
+            if (response.status == 201){
+                totalStatsResponseBody = response.data;
+            }
+        })
+            .catch(function (error) {
+                let responseCode = 500
+                if (error.response) {
+                    responseCode = error.response.status;
+                }
+                throw new CustomError(CustomErrorEnum.ENDGAME_CREATETOTALUSERGAMESTATISTICS_FAILED, responseCode);
+            });
+    }
 
-    return responseBody;
-
-    //return new UserActiveGame object.
+    return totalStatsResponseBody[0].strategiesLearned;
 }
 
 /**
@@ -121,7 +87,7 @@ async function createGameService(closestDifficulty:number, req:any) {
  *
  * @param req
  */
-async function getGameService(req) {
+async function patchLearnedLessons(req) {
 
     let token = req.auth.payload;
     let responseBody = null;
@@ -157,7 +123,7 @@ async function getGameService(req) {
  * @param puzzle
  * @param req
  */
-async function saveGameService(puzzle, req) {
+async function getGameStatistics(puzzle, req) {
 
     let token = req.auth.payload;
     let responseBody = null;
@@ -190,7 +156,7 @@ async function saveGameService(puzzle, req) {
  * @param puzzle
  * @param req
  */
-async function endGameService(puzzle, req) {
+async function deleteGameStatistics(puzzle, req) {
 
     let token = req.auth.payload;
     let totalStatsResponseBody = null;
@@ -399,8 +365,8 @@ async function endGameService(puzzle, req) {
     }
 
 
-    // delete the specified user active game
-    await axios.delete(baseUserActiveGamesUrl + "?userID=" + parseUserID(token.sub.toString()) + "&puzzle=" + puzzle, {
+    // delete the specified user's game statistics
+    await axios.delete(baseUserGameStatisticsUrl + "?userID=" + parseUserID(token.sub.toString()), {
         headers: {
             Authorization: req.headers.authorization
         }
@@ -425,44 +391,9 @@ async function endGameService(puzzle, req) {
     };
 }
 
-/**
- *
- *
- * @param drillStrategy
- * @param req
- */
-async function getDrillService(drillStrategy, req) {
-
-    let responseBody = null;
-
-    // get drill game
-
-    await axios.get(basePuzzleUrl + "?drillStrategies[]=" + drillStrategy + "&count=1&random=true", {
-        headers: {
-            Authorization: req.headers.authorization
-        }
-    }).then(function (response) {
-        if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.GETDRILL_FAILED, response.status);
-        }
-        responseBody = response.data;
-    })
-        .catch(function (error) {
-            let responseCode = 500
-            if (error.response){
-                responseCode = error.response.status;
-            }
-            throw new CustomError(CustomErrorEnum.GETDRILL_FAILED, responseCode);
-        });
-
-    return responseBody;
-
-    //return Puzzle object.
-}
-
 function parseUserID(userID){
     return userID.replace(new RegExp("[|]", "g"), "-")
 }
 
-export = { patchLearnedLessons: getGameService, createGameService: createGameService, getGameStatistics: saveGameService, deleteGameStatistics: endGameService, getDrill: getDrillService };
+export = { patchLearnedLessons: patchLearnedLessons, getLearnedLessons: getLearnedLessons, getGameStatistics: getGameStatistics, deleteGameStatistics: deleteGameStatistics };
 

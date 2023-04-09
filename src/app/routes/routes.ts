@@ -20,7 +20,7 @@ const checkJwt = auth({
 
 const puzzleController = require('../controllers/userGameStatisticsBFF.controller');
 
-routes.get("/learnedLessons/", checkJwt, puzzleController.getLearnedLessons); //later change this to POST activeGames
+routes.get("/learnedLessons/", checkJwt, puzzleController.getLearnedLessons);
 routes.patch("/learnedLessons/", checkJwt, puzzleController.patchLearnedLessons);
 routes.get("/gameStatistics/", checkJwt, puzzleController.getGameStatistics);
 routes.delete("/gameStatistics/", checkJwt, puzzleController.deleteGameStatistics);

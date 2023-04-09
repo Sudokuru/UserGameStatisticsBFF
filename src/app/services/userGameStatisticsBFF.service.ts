@@ -12,8 +12,6 @@ import {CustomError, CustomErrorEnum} from "../models/error.model";
 
 require('dotenv').config();
 const axios = require('axios').default;
-const basePuzzleUrl = process.env.PUZZLE_URL + '/api/v1/puzzles';
-const baseUserActiveGamesUrl = process.env.USER_ACTIVE_GAMES_URL + '/api/v1/user/activeGames';
 const baseUserGameStatisticsUrl = process.env.USER_GAME_STATISTICS_URL + '/api/v1/user/gameStatistics'
 
 
@@ -28,30 +26,30 @@ async function getLearnedLessons(req:any) {
     let token = req.auth.payload;
     let totalStatsResponseBody;
 
-    // retrieve user's total game statistics
-    let totalStatisticsResponseCode = 0;
+    // retrieve user's learned lessons
+    let learnedLessonsResponseCode = 0;
     await axios.get(baseUserGameStatisticsUrl + "?userID=" + parseUserID(token.sub.toString()) + "&dateRange=1111-11-11", {
         headers: {
             Authorization: req.headers.authorization
         }
     }).then(function (response) {
-        totalStatisticsResponseCode = response.status;
+        learnedLessonsResponseCode = response.status;
         if (response.status == 200){
             totalStatsResponseBody = response.data;
         }
     })
         .catch(function (error) {
             if (error.response){
-                totalStatisticsResponseCode = error.response.status;
+                learnedLessonsResponseCode = error.response.status;
             }
         });
 
-    if (totalStatisticsResponseCode != 200 && totalStatisticsResponseCode != 404){
-        throw new CustomError(CustomErrorEnum.ENDGAME_GETTOTALUSERGAMESTATISTICS_FAILED, totalStatisticsResponseCode);
+    if (learnedLessonsResponseCode != 200 && learnedLessonsResponseCode != 404){
+        throw new CustomError(CustomErrorEnum.LEARNEDLESSONS_GETLESSONS_FAILED, learnedLessonsResponseCode);
     }
 
     // if we get a 404 we want to create and initialize user statistics
-    if (totalStatisticsResponseCode == 404) {
+    if (learnedLessonsResponseCode == 404) {
 
         const bodyData = [{
             "userID": parseUserID(token.sub.toString()),
@@ -64,7 +62,7 @@ async function getLearnedLessons(req:any) {
             }
         }).then(function (response) {
             if (response.status !== 201) {
-                throw new CustomError(CustomErrorEnum.ENDGAME_CREATETOTALUSERGAMESTATISTICS_FAILED, response.status);
+                throw new CustomError(CustomErrorEnum.LEARNEDLESSONS_CREATELESSONS_FAILED, response.status);
             }
             if (response.status == 201){
                 totalStatsResponseBody = response.data;
@@ -75,7 +73,7 @@ async function getLearnedLessons(req:any) {
                 if (error.response) {
                     responseCode = error.response.status;
                 }
-                throw new CustomError(CustomErrorEnum.ENDGAME_CREATETOTALUSERGAMESTATISTICS_FAILED, responseCode);
+                throw new CustomError(CustomErrorEnum.LEARNEDLESSONS_CREATELESSONS_FAILED, responseCode);
             });
     }
 
@@ -101,7 +99,7 @@ async function patchLearnedLessons(req) {
         }
     }).then(function (response) {
         if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.GETGAME_GETACTIVEGAME_FAILED, response.status);
+            throw new CustomError(CustomErrorEnum.LEARNEDLESSONS_UPDATELESSONS_FAILED, response.status);
         }
         responseBody = response.data;
     })
@@ -110,7 +108,7 @@ async function patchLearnedLessons(req) {
             if (error.response){
                 responseCode = error.response.status;
             }
-            throw new CustomError(CustomErrorEnum.GETGAME_GETACTIVEGAME_FAILED, responseCode);
+            throw new CustomError(CustomErrorEnum.LEARNEDLESSONS_UPDATELESSONS_FAILED, responseCode);
         });
 
     return responseBody
@@ -134,7 +132,7 @@ async function getGameStatistics(puzzle, req) {
         }
     }).then(function (response) {
         if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.SAVEGAME_PATCHACTIVEGAME_FAILED, response.status);
+            throw new CustomError(CustomErrorEnum.GAMESTATISTICS_GETGAMESTATISTICS_FAILED, response.status);
         }
         responseBody = response.data;
     })
@@ -143,7 +141,7 @@ async function getGameStatistics(puzzle, req) {
             if (error.response){
                 responseCode = error.response.status;
             }
-            throw new CustomError(CustomErrorEnum.SAVEGAME_PATCHACTIVEGAME_FAILED, responseCode);
+            throw new CustomError(CustomErrorEnum.GAMESTATISTICS_GETGAMESTATISTICS_FAILED, responseCode);
         });
 
     return responseBody;
@@ -168,7 +166,7 @@ async function deleteGameStatistics(req) {
         }
     }).then(function (response) {
         if (response.status !== 200){
-            throw new CustomError(CustomErrorEnum.ENDGAME_GETACTIVEGAME_FAILED, response.status);
+            throw new CustomError(CustomErrorEnum.GAMESTATISTICS_DELETEGAMESTATISTICS_FAILED, response.status);
         }
         activeGameResponseBody = response.data;
     })
@@ -177,7 +175,7 @@ async function deleteGameStatistics(req) {
             if (error.response){
                 responseCode = error.response.status;
             }
-            throw new CustomError(CustomErrorEnum.ENDGAME_GETACTIVEGAME_FAILED, responseCode);
+            throw new CustomError(CustomErrorEnum.GAMESTATISTICS_DELETEGAMESTATISTICS_FAILED, responseCode);
         });
 
     return activeGameResponseBody;

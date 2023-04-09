@@ -113,9 +113,7 @@ async function patchLearnedLessons(req) {
             throw new CustomError(CustomErrorEnum.GETGAME_GETACTIVEGAME_FAILED, responseCode);
         });
 
-    return {
-        "strategiesLearned": responseBody[0].strategiesLearned
-    }
+    return responseBody
 }
 
 /**
@@ -158,11 +156,9 @@ async function getGameStatistics(puzzle, req) {
  * @param puzzle
  * @param req
  */
-async function deleteGameStatistics(puzzle, req) {
+async function deleteGameStatistics(req) {
 
     let token = req.auth.payload;
-    let totalStatsResponseBody = null;
-    let dailyStatsResponseBody = null
     let activeGameResponseBody = null;
 
     // Get user active game to be deleted
